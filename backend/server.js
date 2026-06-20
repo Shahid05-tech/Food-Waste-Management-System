@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import http from "http";
+import { Server } from "socket.io";
+
 import authRoutes from "./routes/authRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import connectDB from "./config/db.js";
@@ -16,7 +19,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://food-waste-management-system-jet.vercel.app"
+      "https://food-waste-management-system-jet.vercel.app",
     ],
     credentials: true,
   })
@@ -35,8 +38,36 @@ app.get("/", (req, res) => {
   });
 });
 
+/* ---------------- SOCKET SERVER ---------------- */
+const server = http.createServer(app);
+
+export const io = new Server(server, {
+  cors: {
+    origin: [
+      "http://localhost:5173",
+      "https://food-waste-management-system-jet.vercel.app",
+    ],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`User joined room: ${userId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
+  });
+});
+
+/* ----------------------------------------------- */
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
