@@ -83,6 +83,7 @@
 //   }
 // );
 
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -97,12 +98,10 @@ connectDB();
 
 const app = express();
 
+// Temporary CORS for deployment
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://YOUR-FRONTEND-DOMAIN.vercel.app"
-    ],
+    origin: true,
     credentials: true,
   })
 );

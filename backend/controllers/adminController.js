@@ -1,4 +1,4 @@
-import WasteReport from "../models/WasteReport.js";
+import WasteReport from "../models/wasteReport.js";
 import User from "../models/User.js";
 import PDFDocument from "pdfkit";
 
