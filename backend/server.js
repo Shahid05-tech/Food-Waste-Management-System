@@ -83,10 +83,12 @@
 //   }
 // );
 
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import http from "http";
+import { Server } from "socket.io";
+
 import authRoutes from "./routes/authRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import connectDB from "./config/db.js";
@@ -97,6 +99,15 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
+
+// Create and export socket.io instance
+export const io = new Server(server, {
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+});
 
 // Temporary CORS for deployment
 app.use(
@@ -119,8 +130,18 @@ app.get("/", (req, res) => {
   });
 });
 
+// Optional: socket connection log
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+// IMPORTANT: use server.listen, not app.listen
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
